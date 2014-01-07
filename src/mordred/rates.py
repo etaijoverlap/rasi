@@ -1,7 +1,3 @@
-
-
-
-
 class RateCalculator4State(object):
     def __init__(self):
         self.recharge_primary = None
@@ -34,6 +30,8 @@ class RateCalculator4State(object):
         if changed:
             for key,rate in rates.iteritems():
                 self.timeconstants[key] = rate**-1
+        self.__changed = False
+        return changed
 
     def get_nu(self):
         return self.__nu
