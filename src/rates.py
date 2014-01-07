@@ -29,9 +29,11 @@ class RateCalculator4State(object):
             E = self.__energies ; nu = self.__nu ; T = self.__temperature
             for transition,Eb in self.__energies:
                 rates[transition] = nu * exp( -Eb[transition]/(kB*T) )
+            changed = True
 
-        for key,rate in rates:
-            self.timeconstants[key] = rate**-1
+        if changed:
+            for key,rate in rates.iteritems():
+                self.timeconstants[key] = rate**-1
 
     def get_nu(self):
         return self.__nu
