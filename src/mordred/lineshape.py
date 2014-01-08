@@ -1,4 +1,3 @@
-
 def calc_modal_vector(atoms1,atoms2):
     """
         Calculate the 'modal vector', i.e. the difference vector between the two configurations.
@@ -31,42 +30,42 @@ def calc_modal_vector(atoms1,atoms2):
 
 
 class ClassicalLineShape(object):
-    def numpy_aware_ls(fn):
-        import numpy
-        def numpy_aware_version(self,E,T=None):
-            if isinstance(E,numpy.ndarray):
-                result = numpy.ndarray(E.shape)
-                for i in xrange(E.shape[0]):
-                    result[i] = numpy_aware_version(self,E[i],T)
-            else:
-                result = fn(self,E,T)
-            return result
-        return numpy_aware_version
-
-    def __init__(self, kocc,kunocc,shift,lvl,T=None):
+    def __init__(self):
         """
-            kocc    ... Spring constant for the mode when the electron state 
+            Properties:
+            k_occupied    ... Spring constant for the mode when the electron state 
                         is occupied
-            kunocc  ... Spring constant for the model when the electron state
+            k_unoccupied  ... Spring constant for the model when the electron state
                         is unoccupied
-            shift   ... Configuration shift along the modal coordinate induced
+            equilibrium_shift   ... Configuration shift along the modal coordinate induced
                         by the transition
-            lvl     ... `Thermodynamic level` (i.e. energetic shift between the 
+            thermodynamic_level     ... `Thermodynamic level` (i.e. energetic shift between the 
                          parabolas referenced to some defined energy) for the transition
-              T     ... Temperature (optional), used as default in later calculations
+            temperature     ... Temperature (optional), used as default in later calculations
         """
-        self.kocc   = kocc
-        self.kunocc = kunocc
-        self.shift  = shift
-        self.lvl    = lvl
-        self.T      = T
-    def __check_T(self,T):
-        if T == None:
-            if self.T != None:
-                T = self.T
-            else:
-                raise ValueError("No temperature given, no default temperature set for the lineshape.")
-        return T
+        self.__k_occupied          = None
+        self.__k_unoccupied        = None
+        self.__equilibrium_shift   = None
+        self.__thermodynamic_level = None
+        self.__temperature         = None
+        self.__changed             = False
+
+    @staticmethod
+    def __partitionfunction(Momega2,T):
+        from scipy.constants import pi
+        from scipy.constants import k as kB
+        from scipy import sqrt
+        # (4.79) in my thesis
+        return sqrt(2*pi*kB*T/Momega2)
+
+    def update(self):
+        from numpy import vectorize
+        if self.__changed:
+            self.oxidation = vectorize(self._oxidation)
+            self.reduction = vectorize(self._reduction)
+            self.__changed = False
+            return True
+        return False
 
     def crossings(self,E):
         from scipy import sqrt
@@ -74,8 +73,8 @@ class ClassicalLineShape(object):
             parabolas. (4.82) in my thesis. 
         """
         # Typo alert equation (4.82): Q' in the square root should be Q'**2
-        k0 = self.kocc; kp = self.kunocc ; shift = self.shift
-        lvl = self.lvl
+        k0 = self.k_occupied; kp = self.k_unoccupied ; shift = self.equilibrium_shift
+        lvl = self.thermodynamic_level
 
         # The expressions are of the form ( a +/- sqrt(b) ) / D
         a = kp*shift
@@ -86,21 +85,50 @@ class ClassicalLineShape(object):
             raise ValueError("Parabolas have no real-valued crossings")
         return ( ( a + sqrt(b) ) / D, (a - sqrt(b) ) / D )
 
-    def __partitionfunction(self,Momega2,T):
-        from scipy.constants import pi
-        from scipy.constants import k as kB
-        from scipy import sqrt
-        # (4.79) in my thesis
-        return sqrt(2*pi*kB*T/Momega2)
+    def get_k_occupied(self):
+        return self.__k_occupied
+    def set_k_occupied(self,k):
+        self.__k_occupied = k
+        self.__changed = True
+    k_occupied = property(get_k_occupied,set_k_occupied)
+
+    def get_k_unoccupied(self):
+        return self.__k_unoccupied 
+    def set_k_unoccupied(self,k):
+        self.__k_unoccupied  = k
+        self.__changed = True
+    k_unoccupied = property(get_k_unoccupied,set_k_unoccupied)
+
+    def get_equilibrium_shift(self):
+        return self.__equilibrium_shift
+    def set_equilibrium_shift(self,s):
+        self.__equilibrium_shift = s
+        self.__changed = True
+    equilibrium_shift = property(get_equilibrium_shift,set_equilibrium_shift)
+
+    def get_thermodynamic_level(self):
+        return self.__thermodynamic_level
+    def set_thermodynamic_level(self,t):
+        self.__thermodynamic_level = t
+        self.__changed = True
+    thermodynamic_level = property(get_thermodynamic_level,set_thermodynamic_level)
+
+    def get_temperature(self):
+        return self.__temperature
+    def set_temperature(self,T):
+        self.__temperature = T
+        self.__changed     = True
+    temperature = property(get_temperature,set_temperature)
+
 
         
-    @numpy_aware_ls
-    def oxidation(self,E,T=None):
+    # To all Java/C++/... programmers: remember that those methods are DETACHABLE!
+    def _oxidation(self,E):
         from scipy import exp,sqrt,pi
         from scipy.constants import k as kB
-        T = self.__check_T(T)
-        k0 = self.kocc     ; kp = self.kunocc
-        shift = self.shift ; lvl = self.lvl
+        T = self.temperature
+        k0 = self.k_occupied     ; kp = self.k_unoccupied
+        shift = self.equilibrium_shift ; lvl = self.thermodynamic_level
         Momega20 = 2*k0    ; Momega2P = 2*kp
         Z0 = self.__partitionfunction(Momega20,T)
 
@@ -114,16 +142,15 @@ class ClassicalLineShape(object):
         # (4.83) Beware of another typo!
         return Z0**-1*(exp(-k0*Q1**2/(kB*T))/denom1+exp(-k0*Q2**2/(kB*T))/denom2)
     
-    @numpy_aware_ls
-    def reduction(self,E,T=None):
+    def _reduction(self,E):
         from scipy import exp,sqrt,pi
         from scipy.constants import k as kB
-        T = self.__check_T(T)
-        k0 = self.kocc     ; kp = self.kunocc
-        shift = self.shift ; lvl = self.lvl
+        T = self.temperature
+        k0 = self.k_occupied     ; kp = self.k_unoccupied
+        shift = self.equilibrium_shift ; lvl = self.thermodynamic_level
         Momega20 = 2*k0    ; Momega2P = 2*kp
         # First the partition function (4.80) in my thesis
-        ZP = sqrt(2*pi*kB*T/Momega2P)
+        ZP = self.__partitionfunction(Momega2P,T)
 
         try:
             Q1,Q2 = self.crossings(E)
@@ -136,4 +163,69 @@ class ClassicalLineShape(object):
         # (4.84) Beware of another typo!
         return ZP**-1*(exp(-kp*(Q1-shift)**2/(kB*T))/denom1+exp(-kp*(Q2-shift)**2/(kB*T))/denom2)
 
+class LineShapeBuffer(object):
+    def __init__(self):
+        self.__lineshape   = None
+        self.__energy_grid = None
+        self.__changed = False
+
+    def update(self):
+        from scipy.interpolate import interp1d
+        ls_changed = self.lineshape.update()
+
+        changed = self.__changed or ls_changed
+        self.__changed = False
+
+        if changed:
+            self.oxidation_values = self.lineshape.oxidation(self.energy_grid)
+            self.reduction_values = self.lineshape.reduction(self.energy_grid)
+
+            self.oxidation = interp1d(self.energy_grid,self.oxidation_values,bounds_error=False,fill_value=0.)  
+            self.reduction = interp1d(self.energy_grid,self.reduction_values,bounds_error=False,fill_value=0.)  
+            return True
+        return False
+
+    def get_lineshape(self):
+        return self.__lineshape
+    def set_lineshape(self,l):
+        self.__lineshape = l
+        self.__changed = True
+    lineshape = property(get_lineshape,set_lineshape)
+
+    def get_energy_grid(self):
+        return self.__energy_grid
+    def set_energy_grid(self,E):
+        self.__energy_grid = E
+    energy_grid = property(get_energy_grid,set_energy_grid)
+
+class LineShapeEnergyCorrector(object):
+    def __init__(self):
+        self.__lineshape         = None
+        self.__correction_energy = 0.
+        self.__changed = False
+
+    def update(self):
+        return self.lineshape.update()
+
+    def oxidation(self,E):
+        E_c = self.correction_energy
+        return self.lineshape.oxidation(E + E_c)
+
+    def reduction(self,E):
+        E_c = self.correction_energy
+        return self.lineshape.reduction(E + E_c)
+
+    def get_lineshape(self):
+        return self.__lineshape
+    def set_lineshape(self,l):
+        self.__lineshape = l
+        self.__changed = True
+    lineshape = property(get_lineshape,set_lineshape)
+
+    def set_correction_energy(self,E):
+        self.__correction_energy = E
+        self.__changed = True
+    def get_correction_energy(self):
+        return self.__correction_energy
+    correction_energy = property(get_correction_energy,set_correction_energy)
 
