@@ -12,7 +12,7 @@ class FullNMPTransition(object):
     def update(self):
         from scipy.integrate import trapz
         ls_changed = self.lineshape.update()
-        em_changed = False #self.electronic_matrix_element.update()
+        em_changed = self.electronic_matrix_element.update()
         changed = (self.__changed or ls_changed or em_changed)
         self.__changed = False
         if changed:

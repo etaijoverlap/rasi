@@ -2,7 +2,17 @@ def lininterpolate(x,x1,y1,x2,y2):
     return (x-x1)/(x2-x1) * y1 + (x2-x)/(x2-x1) * y2
 
 def loginterpolate(x,x1,y1,x2,y2):
+    from math import log,exp
+    if y1 == 0 or y2 == 0:
+        return 0.0
     return exp(lininterpolate(x,x1,log(y1),x2,log(y2)))
+
+def loginterpolatearray(x,x1,y1,x2,y2):
+    from numpy import zeros
+    result = zeros(y1.shape)
+    for i in xrange(len(y1)):
+        result[i] = loginterpolate(x,x1,y1[i],x2,y2[i])
+    return result
 
 
 class EMF1DPositionInterpolator(object):
@@ -15,11 +25,12 @@ class EMF1DPositionInterpolator(object):
         if position != None: self.position = position
 
     def update(self):
+        from numpy import vectorize
         if self.__changed:
             x = self.position
 
             defects = [ defect for defect in self.emf._defects ]
-            defects.sort(key=(lambda defect: float(defect._info)))
+            #defects.sort(key=(lambda defect: float(defect._info)))
 
             positions = [ float(defect._info) for defect in self.emf._defects ]
 
@@ -45,9 +56,9 @@ class EMF1DPositionInterpolator(object):
                 E_higher,d_higher  = defects[i_higher].oxidation_reservoir[name]
                 x_lower  = positions[i_lower]
                 x_higher = positions[i_higher] 
-                if E_lower != E_higher:
+                if (E_lower != E_higher).any():
                     raise ValueError("Energy grids of EMF defect objects don't match")
-                oxidation_reservoir[name] = E_lower,loginterpolate(x,x_lower,d_lower,x_higher,d_higher)
+                oxidation_reservoir[name] = E_lower,lininterpolate(x,x_lower,d_lower,x_higher,d_higher)
 
             reduction_reservoir = {}
             for name in defects[i_lower].reduction_reservoir.iterkeys():
@@ -55,12 +66,16 @@ class EMF1DPositionInterpolator(object):
                 E_higher,d_higher  = defects[i_higher].reduction_reservoir[name]
                 x_lower  = positions[i_lower]
                 x_higher = positions[i_higher] 
-                if E_lower != E_higher:
+                if (E_lower != E_higher).any():
                     raise ValueError("Energy grids of EMF defect objects don't match")
-                reduction_reservoir[name] = E_lower,loginterpolate(x,x_lower,d_lower,x_higher,d_higher)
+                reduction_reservoir[name] = E_lower,lininterpolate(x,x_lower,d_lower,x_higher,d_higher)
 
             self.oxidation_reservoir = oxidation_reservoir
             self.reduction_reservoir = reduction_reservoir
+
+            self.Ec  = lininterpolate(x,x_lower,defects[i_lower].Ec ,x_higher,defects[i_higher].Ec )
+            self.Ev  = lininterpolate(x,x_lower,defects[i_lower].Ev ,x_higher,defects[i_higher].Ev )
+            self.phi = lininterpolate(x,x_lower,defects[i_lower].phi,x_higher,defects[i_higher].phi)
             self.__changed = False
             return True
         return False
