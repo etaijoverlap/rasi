@@ -1,10 +1,14 @@
 class FullNMPTransition(object):
-    def __init__(self):
+    def __init__(self, lineshape = None, electronic_matrix_element = None, mlambda = None):
         self.__lineshape                 = None
         self.__electronic_matrix_element = None
         self.__mlambda                   = None
         self.__changed                   = False
         
+        if lineshape                 != None: self.lineshape                 = lineshape
+        if electronic_matrix_element != None: self.electronic_matrix_element = electronic_matrix_element
+        if mlambda                   != None: self.mlambda                   = mlambda
+
     def update(self):
         from scipy.integrate import trapz
         ls_changed = self.lineshape.update()

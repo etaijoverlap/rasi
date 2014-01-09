@@ -1,15 +1,21 @@
 class RateCalculator4State(object):
-    def __init__(self):
+    def __init__(self, recharge_primary = None, recharge_secondary = None, nu = None, energies = None, temperature = None):
         self.__recharge_primary = None
         self.__recharge_secondary = None
         self.__nu = 0.
         self.__energies = {}
-        self.__temperature = 1.
+        self.__temperature = None
         self.__primary_changed = False
         self.__secondary_changed = False
         self.__changed = True
         self.rates = {}
         self.timeconstants = {}
+
+        if recharge_primary   != None: self.recharge_primary   = recharge_primary
+        if recharge_secondary != None: self.recharge_secondary = recharge_secondary
+        if nu                 != None: self.nu                 = nu
+        if energies           != None: self.energies           = energies
+        if temperature        != None: self.temperature        = temperature
 
     def update(self):
         from scipy.constants import k as kB

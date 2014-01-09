@@ -30,7 +30,7 @@ def calc_modal_vector(atoms1,atoms2):
 
 
 class ClassicalLineShape(object):
-    def __init__(self):
+    def __init__(self, k_occupied=None, k_unoccupied=None, equilibrium_shift=None, thermodynamic_level=None, temperature=None):
         """
             Properties:
             k_occupied    ... Spring constant for the mode when the electron state 
@@ -49,6 +49,12 @@ class ClassicalLineShape(object):
         self.__thermodynamic_level = None
         self.__temperature         = None
         self.__changed             = False
+
+        if k_occupied          != None: self.k_occupied          = k_occupied
+        if k_unoccupied        != None: self.k_unoccupied        = k_unoccupied
+        if equilibrium_shift   != None: self.equilibrium_shift   = equilibrium_shift
+        if thermodynamic_level != None: self.thermodynamic_level = thermodynamic_level
+        if temperature         != None: self.temperature         = temperature
 
     @staticmethod
     def __partitionfunction(Momega2,T):
@@ -164,10 +170,13 @@ class ClassicalLineShape(object):
         return ZP**-1*(exp(-kp*(Q1-shift)**2/(kB*T))/denom1+exp(-kp*(Q2-shift)**2/(kB*T))/denom2)
 
 class LineShapeBuffer(object):
-    def __init__(self):
+    def __init__(self, lineshape = None, energy_grid = None):
         self.__lineshape   = None
         self.__energy_grid = None
         self.__changed = False
+
+        if lineshape   != None: self.lineshape = lineshape
+        if energy_grid != None: self.energy_grid = energy_grid
 
     def update(self):
         from scipy.interpolate import interp1d
@@ -199,10 +208,13 @@ class LineShapeBuffer(object):
     energy_grid = property(get_energy_grid,set_energy_grid)
 
 class LineShapeEnergyCorrector(object):
-    def __init__(self):
+    def __init__(self, lineshape = None, correction_energy = None):
         self.__lineshape         = None
         self.__correction_energy = 0.
         self.__changed = False
+
+        if lineshape         != None: self.lineshape = lineshape
+        if correction_energy != None: self.correction_energy = correction_energy
 
     def update(self):
         return self.lineshape.update()

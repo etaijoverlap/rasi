@@ -1,7 +1,9 @@
 class StaticTDDS4State(object):
-    def __init__(self):
+    def __init__(self,microscopic_rate_calculator = None):
         self.__microscopic_rate_calculator = None
         self.__changed = False
+
+        if microscopic_rate_calculator != None: self.microscopic_rate_calculator = microscopic_rate_calculator
 
     def update(self):
         if self.microscopic_rate_calculator == None:
