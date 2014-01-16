@@ -17,4 +17,5 @@
 ###############################################################################
 
 
-
+from tools     import calc_modal_vector
+from classical import ClassicalLineShape

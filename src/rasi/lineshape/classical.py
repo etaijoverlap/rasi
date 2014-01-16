@@ -17,36 +17,6 @@
 ###############################################################################
 
 
-def calc_modal_vector(atoms1,atoms2):
-    """
-        Calculate the 'modal vector', i.e. the difference vector between the two configurations.
-        The minimum image convention is applied!
-    """
-    from scipy.linalg import inv
-    from scipy        import array,dot
-    from scipy        import sign,floor
-    cell1 = atoms1.get_cell()
-    cell2 = atoms2.get_cell()
-
-    # The cells need to be the same (otherwise the whole process won't make sense)
-    if (cell1 != cell2).any():
-        raise ValueError("Encountered different cells in atoms1 and atoms2. Those need to be the same.")
-    cell = cell1
-
-    icell = inv(cell)
-                                            
-    frac1 = atoms1.get_scaled_positions()
-    frac2 = atoms2.get_scaled_positions()
-    modal_vector_frac = frac1 - frac2
-    for i in range(modal_vector_frac.shape[0]):
-        for j in range(modal_vector_frac.shape[1]):
-            if abs(modal_vector_frac[i,j]) > .5:
-                value = modal_vector_frac[i,j]
-                vsign = sign(modal_vector_frac[i,j])
-                absvalue = abs(value)
-                modal_vector_frac[i,j] = value - vsign*floor(absvalue+.5)
-    return dot(modal_vector_frac,cell)
-
 
 class ClassicalLineShape(object):
     def __init__(self, k_occupied=None, k_unoccupied=None, equilibrium_shift=None, thermodynamic_level=None, temperature=None):
@@ -187,76 +157,4 @@ class ClassicalLineShape(object):
 
         # (4.84) Beware of another typo!
         return ZP**-1*(exp(-kp*(Q1-shift)**2/(kB*T))/denom1+exp(-kp*(Q2-shift)**2/(kB*T))/denom2)
-
-class LineShapeBuffer(object):
-    def __init__(self, lineshape = None, energy_grid = None):
-        self.__lineshape   = None
-        self.__energy_grid = None
-        self.__changed = False
-
-        if lineshape   != None: self.lineshape = lineshape
-        if energy_grid != None: self.energy_grid = energy_grid
-
-    def update(self):
-        from scipy.interpolate import interp1d
-        ls_changed = self.lineshape.update()
-
-        changed = self.__changed or ls_changed
-        self.__changed = False
-
-        if changed:
-            self.oxidation_values = self.lineshape.oxidation(self.energy_grid)
-            self.reduction_values = self.lineshape.reduction(self.energy_grid)
-
-            self.oxidation = interp1d(self.energy_grid,self.oxidation_values,bounds_error=False,fill_value=0.)  
-            self.reduction = interp1d(self.energy_grid,self.reduction_values,bounds_error=False,fill_value=0.)  
-            return True
-        return False
-
-    def get_lineshape(self):
-        return self.__lineshape
-    def set_lineshape(self,l):
-        self.__lineshape = l
-        self.__changed = True
-    lineshape = property(get_lineshape,set_lineshape)
-
-    def get_energy_grid(self):
-        return self.__energy_grid
-    def set_energy_grid(self,E):
-        self.__energy_grid = E
-    energy_grid = property(get_energy_grid,set_energy_grid)
-
-class LineShapeEnergyCorrector(object):
-    def __init__(self, lineshape = None, correction_energy = None):
-        self.__lineshape         = None
-        self.__correction_energy = 0.
-        self.__changed = False
-
-        if lineshape         != None: self.lineshape = lineshape
-        if correction_energy != None: self.correction_energy = correction_energy
-
-    def update(self):
-        return self.lineshape.update()
-
-    def oxidation(self,E):
-        E_c = self.correction_energy
-        return self.lineshape.oxidation(E + E_c)
-
-    def reduction(self,E):
-        E_c = self.correction_energy
-        return self.lineshape.reduction(E + E_c)
-
-    def get_lineshape(self):
-        return self.__lineshape
-    def set_lineshape(self,l):
-        self.__lineshape = l
-        self.__changed = True
-    lineshape = property(get_lineshape,set_lineshape)
-
-    def set_correction_energy(self,E):
-        self.__correction_energy = E
-        self.__changed = True
-    def get_correction_energy(self):
-        return self.__correction_energy
-    correction_energy = property(get_correction_energy,set_correction_energy)
 
