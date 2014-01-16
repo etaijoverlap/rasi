@@ -16,10 +16,6 @@
 #
 ###############################################################################
 
-
-from tools     import calc_modal_vector, \
-                      LineShapeBuffer, \
-                      LineShapeEnergyCorrector
-
-from classical import ClassicalLineShape
-from schmidt   import SchmidtOverlaps
+def OverlapsBasedLineShape(object):
+    def __init__(self, overlaps=None, smearing=None):
+        pass
