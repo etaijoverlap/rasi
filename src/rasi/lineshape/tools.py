@@ -129,7 +129,7 @@ def calc_modal_vector(atoms1,atoms2):
 
 
 ############# Everything below this line may be legacy code. ####################
-
+"""
 def group(LS,         # Line shape list consisting of (E,p) pairs
           group_dist, # maximum distance for grouping
           echo=True   # Report status to stdout
@@ -186,31 +186,6 @@ def write_matrix(filename,matrix):
     except StopIteration: pass
 
 
-def smear(xy,    # (x,y) pairs
-          dx,    # Separation of spatial samples
-          sigma, # Standard deviation of the smearing gaussian
-          echo=True # Report status to stdout
-          ):
-    from scipy import array,exp
-    xvals = [ x for x,y in xy ]
-    xmin = min(xvals)
-    xmax = max(xvals)
-    if echo:
-        from units import eV
-        print
-        print "Applying gaussian smearing"
-        print "--------------------------"
-        print
-        print "   sigma = %20.5e"%(sigma/eV)
-        print "      dx = %20.5e"%(dx/eV)
-        print "    xmin = %20.5e"%(xmin/eV)
-        print "    xmax = %20.5e"%(xmax/eV)
-    xvals  = array(gen_grid(xmin,xmax,dx))
-    ysmear = array([ 0. for _ in xvals ])
-    for x0,y0 in xy:
-        ysmear += (y0*(2.*pi*sigma**2)**-.5)*exp(-(xvals-x0)**2/(2*sigma**2)) 
-    return xvals,ysmear
-
 def calc_lsf(Ew_i, # Eigenvalues of initial state
              Ew_f, # Eigenvalues of final state
              S,    # Overlap matrix
@@ -248,9 +223,6 @@ def calc_lsf(Ew_i, # Eigenvalues of initial state
     LS.sort(lambda (E1,_1),(E2,_2): 1 if E1>E2 else -1)
     return LS
 
-from math import exp
-harmosc_pf = lambda omega,T: exp(-hred*omega/(kB*T)*1./2)/(1.-exp(-hred*omega/(kB*T)))
-
 
 def compare_results((Ew_i_1,Ew_f_1,S_1),(Ew_i_2,Ew_f_2,S_2)):
     print 
@@ -278,4 +250,4 @@ def compare_results((Ew_i_1,Ew_f_1,S_1),(Ew_i_2,Ew_f_2,S_2)):
     print " E finl   %20.5e"%E_finl_err
     print " Ovl.Mat. %20.5e"%S_err
 
-   
+""" 

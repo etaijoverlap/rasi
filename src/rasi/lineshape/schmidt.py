@@ -141,3 +141,13 @@ class SchmidtOverlaps(object):
         self.__n_states_unoccupied = n
         self.__changed = True
     n_states_unoccupied = property(get_n_states_unoccupied,set_n_states_unoccupied)
+
+    def partition_function_occupied(self,temperature):
+        from harmonic import harmonic_oscillator_partition_function
+        return harmonic_oscillator_partition_function(self.omega_occupied,temperature)
+
+    def partition_function_unoccupied(self,temperature):
+        from harmonic import harmonic_oscillator_partition_function
+        return harmonic_oscillator_partition_function(self.omega_unoccupied,temperature)
+
+        
