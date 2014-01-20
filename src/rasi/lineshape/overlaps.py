@@ -106,7 +106,7 @@ class DiscreteLineShape(object):
             for i in xrange(len(p_occupied)):
                 for j in xrange(len(p_unoccupied)):
                     oxidation.append((ET+E_occupied[i]-E_unoccupied[j] , p_occupied[i]   * S[i,j]**2))
-                    reduction.append((ET+E_occupied[i]-E_unoccupied[j] , p_unoccupied[j] * S[j,i]**2))
+                    reduction.append((ET+E_occupied[i]-E_unoccupied[j] , p_unoccupied[j] * S[i,j]**2))
             oxidation.sort(key=(lambda (E,w): E))
             reduction.sort(key=(lambda (E,w): E))
 

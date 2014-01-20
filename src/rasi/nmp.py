@@ -74,3 +74,118 @@ class FullNMPTransition(object):
         return self.__mlambda
     mlambda = property(get_mlambda,set_mlambda)
     
+class ColdCarrierNumerical(object):
+    def __init__(self):
+        self.__CBE_interface              = None
+        self.__VBE_interface              = None
+        self.__VBE_defect                 = None
+        self.__thermodynamic_level        = None
+        self.__temperature                = None
+        self.__electron_density_interface = None
+        self.__hole_density_interface     = None
+        self.__tunneling_factor           = None
+        self.__lineshape                  = None
+
+        self.__changed = False
+
+    def update(self):
+        from scipy.constants import k as kB
+        from math import exp
+
+        changed = self.__changed
+        self.__changed = False
+        ls_changed = self.lineshape.update()
+        
+        if changed or ls_changed:
+            Eci = self.CBE_interface
+            Evi = self.VBE_interface
+            Evd = self.VBE_defect
+            ET  = self.thermodynamic_level
+            T   = self.temperature
+            n   = self.electron_density_interface
+            p   = self.hole_density_interface
+            TF  = self.tunneling_factor
+
+            lsf = self.lineshape
+
+            c_p = p*TF*lsf.oxidation(Evi-Evd)
+            c_n = n*TF*lsf.reduction(Eci-Evd)
+            #Detailed balance
+            self.oxidation_rate = c_p + c_n * exp(-(Eci-ET)/(kB*T))
+            self.reduction_rate = c_n + c_p * exp(-(ET-Evi)/(kB*T))
+            return True
+        return False
+
+    def get_CBE_interface(self):
+        return self.__CBE_interface
+    def set_CBE_interface(self,v):
+        self.__CBE_interface = v
+        self.__changed = True
+    CBE_interface = property(get_CBE_interface,set_CBE_interface)
+
+    def get_VBE_interface(self):
+        return self.__VBE_interface
+    def set_VBE_interface(self,v):
+        self.__VBE_interface = v
+        self.__changed = True
+    VBE_interface = property(get_VBE_interface,set_VBE_interface)
+
+    def get_VBE_defect(self):
+        return self.__VBE_defect
+    def set_VBE_defect(self,v):
+        self.__VBE_defect = v
+        self.__changed = True
+    VBE_defect = property(get_VBE_defect,set_VBE_defect)
+
+    def get_thermodynamic_level(self):
+        return self.__thermodynamic_level
+    def set_thermodynamic_level(self,v):
+        self.__thermodynamic_level = v
+        self.__changed = True
+    thermodynamic_level = property(get_thermodynamic_level,set_thermodynamic_level)
+
+    def get_temperature(self):
+        return self.__temperature
+    def set_temperature(self,v):
+        self.__temperature = v
+        self.__changed = True
+    temperature = property(get_temperature,set_temperature)
+
+    def get_electron_density_interface(self):
+        return self.__electron_density_interface
+    def set_electron_density_interface(self,v):
+        self.__electron_density_interface = v
+        self.__changed = True
+    electron_density_interface = property(get_electron_density_interface,set_electron_density_interface)
+
+    def get_hole_density_interface(self):
+        return self.__hole_density_interface
+    def set_hole_density_interface(self,v):
+        self.__hole_density_interface = v
+        self.__changed = True
+    hole_density_interface = property(get_hole_density_interface,set_hole_density_interface)
+
+    def get_tunneling_factor(self):
+        return self.__tunneling_factor
+    def set_tunneling_factor(self,v):
+        self.__tunneling_factor = v
+        self.__changed = True
+    tunneling_factor = property(get_tunneling_factor,set_tunneling_factor)
+
+    def get_lineshape(self):
+        return self.__lineshape
+    def set_lineshape(self,v):
+        self.__lineshape = v
+        print self.__lineshape
+        self.__changed = True
+    lineshape = property(get_lineshape,set_lineshape)
+
+
+
+#    def get_XXX(self):
+#        return self.__XXX
+#    def set_XXX(self,v):
+#        self.__XXX = v
+#        self.__changed = True
+#    XXX = property(get_XXX,set_XXX)
+
