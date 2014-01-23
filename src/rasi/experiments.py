@@ -16,9 +16,9 @@
 #
 ###############################################################################
 
-from rasi.base import BaseCalculator
+from rasi.base import BasicCalculator
 
-class StaticTDDS4State(BaseCalculator):
+class StaticTDDS4State(BasicCalculator):
     def __init__(self,**kwargs):
         self.init_variables(
                 inputs = {

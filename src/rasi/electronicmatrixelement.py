@@ -16,6 +16,8 @@
 #
 ###############################################################################
 
+from rasi.base import BasicCalculator
+
 def lininterpolate(x,x1,y1,x2,y2):
     return (x-x1)/(x2-x1) * y1 + (x2-x)/(x2-x1) * y2
 
@@ -33,18 +35,25 @@ def loginterpolatearray(x,x1,y1,x2,y2):
     return result
 
 
-class EMF1DPositionInterpolator(object):
-    def __init__(self, emf=None, position=None):
-        self.__emf      = None
-        self.__position = None
-        self.__changed  = False
+class EMF1DPositionInterpolator(BasicCalculator):
+    def __init__(self, **kwargs):
+        self.init_input_variables(
+                 emf      = None,
+                 position = None,
+                 )
+        self.init_output_variables(
+                 oxidation_reservoir = None,
+                 reduction_reservoir = None,
+                 Ec = None,
+                 Ev = None,
+                 phi = None
+                 )
+        self.set_variables(kwargs)
 
-        if emf      != None: self.emf      = emf
-        if position != None: self.position = position
 
     def update(self):
         from numpy import vectorize
-        if self.__changed:
+        if self.changed:
             x = self.position
 
             defects = [ defect for defect in self.emf._defects ]
@@ -88,26 +97,12 @@ class EMF1DPositionInterpolator(object):
                     raise ValueError("Energy grids of EMF defect objects don't match")
                 reduction_reservoir[name] = E_lower,lininterpolate(x,x_lower,d_lower,x_higher,d_higher)
 
-            self.oxidation_reservoir = oxidation_reservoir
-            self.reduction_reservoir = reduction_reservoir
+            self.internal_oxidation_reservoir = oxidation_reservoir
+            self.internal_reduction_reservoir = reduction_reservoir
 
-            self.Ec  = lininterpolate(x,x_lower,defects[i_lower].Ec ,x_higher,defects[i_higher].Ec )
-            self.Ev  = lininterpolate(x,x_lower,defects[i_lower].Ev ,x_higher,defects[i_higher].Ev )
-            self.phi = lininterpolate(x,x_lower,defects[i_lower].phi,x_higher,defects[i_higher].phi)
-            self.__changed = False
+            self.internal_Ec  = lininterpolate(x,x_lower,defects[i_lower].Ec ,x_higher,defects[i_higher].Ec )
+            self.internal_Ev  = lininterpolate(x,x_lower,defects[i_lower].Ev ,x_higher,defects[i_higher].Ev )
+            self.internal_phi = lininterpolate(x,x_lower,defects[i_lower].phi,x_higher,defects[i_higher].phi)
             return True
         return False
 
-    def get_emf(self):
-        return self.__emf
-    def set_emf(self,emf):
-        self.__emf = emf
-        self.__changed = True
-    emf = property(get_emf,set_emf)
-
-    def get_position(self):
-        return self.__position
-    def set_position(self,d):
-        self.__position = d
-        self.__changed = True
-    position = property(get_position,set_position)

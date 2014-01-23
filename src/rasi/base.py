@@ -16,7 +16,7 @@
 #
 ###############################################################################
 
-class BaseCalculator(object):
+class BasicCalculator(object):
     def __init__(self):
         self.__dict__["_input_variables"]  = {}
         self.__dict__["_output_variables"]  = {}
@@ -34,13 +34,13 @@ class BaseCalculator(object):
         
 
     def set_input_variable(self,name,value):
-        BaseCalculator.check_reserved(name)
+        BasicCalculator.check_reserved(name)
         self.__dict__["_input_variables"][name] = value
         self.__dict__["_changes"][name] = False
        
 
     def set_output_variable(self,name,value):
-        BaseCalculator.check_reserved(name)
+        BasicCalculator.check_reserved(name)
         self.__dict__["_output_variables"][name] = value
 
     def init_variables(self,inputs=None,outputs = None):

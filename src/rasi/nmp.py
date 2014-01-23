@@ -16,24 +16,27 @@
 #
 ###############################################################################
 
+from rasi.base import BasicCalculator
 
-class FullNMPTransition(object):
-    def __init__(self, lineshape = None, electronic_matrix_element = None, mlambda = None):
-        self.__lineshape                 = None
-        self.__electronic_matrix_element = None
-        self.__mlambda                   = None
-        self.__changed                   = False
+class FullNMPTransition(BasicCalculator):
+    def __init__(self, **kwargs):
+        self.init_input_variables(
+                    lineshape = None,
+                    electronic_matrix_element = None,
+                    mlambda                   = None
+                    )
+        self.init_output_variables(
+                oxidation_rate = None,
+                reduction_rate = None
+                )
+        self.set_variables(kwargs)
         
-        if lineshape                 != None: self.lineshape                 = lineshape
-        if electronic_matrix_element != None: self.electronic_matrix_element = electronic_matrix_element
-        if mlambda                   != None: self.mlambda                   = mlambda
 
     def update(self):
         from scipy.integrate import trapz
         ls_changed = self.lineshape.update()
         em_changed = self.electronic_matrix_element.update()
-        changed = (self.__changed or ls_changed or em_changed)
-        self.__changed = False
+        changed = (self.changed or ls_changed or em_changed)
         if changed:
             eme = self.electronic_matrix_element
             oxidation_lsf = self.lineshape.oxidation
@@ -47,32 +50,11 @@ class FullNMPTransition(object):
             for E,d in eme.reduction_reservoir.itervalues():
                 reduction_rate += mlambda*trapz(d*reduction_lsf(E-Ev),E)
                 
-            self.oxidation_rate = oxidation_rate
-            self.reduction_rate = reduction_rate
+            self.internal_oxidation_rate = oxidation_rate
+            self.internal_reduction_rate = reduction_rate
             return True
         return False
-        
     
-    def set_lineshape(self,ls):
-        self.__lineshape = ls
-        self.__changed = True
-    def get_lineshape(self):
-        return self.__lineshape
-    lineshape = property(get_lineshape,set_lineshape)
-
-    def set_electronic_matrix_element(self,d):
-        self.__electronic_matrix_element = d
-        self.__changed = True
-    def get_electronic_matrix_element(self):
-        return self.__electronic_matrix_element
-    electronic_matrix_element = property(get_electronic_matrix_element,set_electronic_matrix_element)
-
-    def set_mlambda(self,mlambda):
-        self.__mlambda = mlambda
-        self.__changed = True
-    def get_mlambda(self):
-        return self.__mlambda
-    mlambda = property(get_mlambda,set_mlambda)
     
 class ColdCarrierNumerical(object):
     def __init__(self):

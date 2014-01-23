@@ -17,9 +17,9 @@
 ###############################################################################
 
 
-from rasi.base import BaseCalculator
+from rasi.base import BasicCalculator
 
-class RateCalculator4State(BaseCalculator):
+class RateCalculator4State(BasicCalculator):
     def __init__(self, **kwargs):
         self.init_input_variables(
                 recharge_primary = None,
