@@ -51,7 +51,7 @@ class EMF1DPositionInterpolator(BasicCalculator):
         self.set_variables(kwargs)
 
 
-    def update(self):
+    def do_update(self):
         from numpy import vectorize
         if self.changed:
             x = self.position

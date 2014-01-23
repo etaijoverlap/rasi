@@ -71,9 +71,7 @@ class BasicCalculator(object):
 
     def set_variables(self,kwargs):
         for key,value in kwargs.iteritems():
-            if not key in self._input_variables.keys():
-                raise AttributeError("%s is not an input variable."%key)
-            self._input_variables[key] = value
+            self.__setattr__(key,value)
             
 
     def __getattr__(self,var):

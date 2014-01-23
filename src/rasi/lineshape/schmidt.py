@@ -16,36 +16,57 @@
 #
 ###############################################################################
 
+from rasi.base import BasicCalculator
 
-class SchmidtOverlaps(object):
-    def __init__(self, omega_occupied=None, omega_unoccupied=None, mass=None, equilibrium_shift=None, n_states_occupied=None, n_states_unoccupied=None):
+class SchmidtOverlaps(BasicCalculator):
+    """
+        SchmidtOverlaps calculates harmonic oscillator overlaps using the
+        recursion formulas published in P.P. Schmidt Molecular Physics 108 pp.1513-1529 (2010).
+
+        INPUT PARAMETERS:
+        ----------------
+
+        omega_occupied .................. Angular oscillation frequency for the occupied state
+        omega_unoccupied ................ Angular oscillation frequency for the unoccupied state
+        mass ............................ Modal mass
+        equilibrium_shift ............... Shift between the equilibrium coordinates of the two states
+        n_states_occupied ............... Number of vibrational states to consider in the occupied state
+        n_states_unoccupied ............. Number of vibrational states to consider in the unoccupied state
+
+
+        OUTPUT PARAMETERS:
+        -----------------
+        
+        energies_occupied ............... Array of vibrational energies in the occupied state.
+        energies_unoccupied ............. Array of vibrational energies in the unoccupied state.
+        overlap_matrix .................. The overlap matrix between the occupied and unoccupied states
+                                          (first index corresponds to occupied, second to unoccupied.
         """
-                Properties:
-        """ 
-        self.__omega_occupied      = None
-        self.__omega_unoccupied    = None
-        self.__mass                = None
-        self.__equilibrium_shift   = None
-        self.__n_states_occupied   = 200
-        self.__n_states_unoccupied = 200
 
-        self.__changed = False
 
-        if omega_occupied      != None: self.omega_occupied      = omega_occupied
-        if omega_unoccupied    != None: self.omega_unoccupied    = omega_unoccupied
-        if mass                != None: self.mass                = mass
-        if equilibrium_shift   != None: self.equilibrium_shift   = equilibrium_shift
-        if n_states_occupied   != None: self.n_states_occupied   = n_states_occupied
-        if n_states_unoccupied != None: self.n_states_unoccupied = n_states_unoccupied
+    def __init__(self, **kwargs):
+        
+        self.init_input_variables(
+                                  omega_occupied      = None,
+                                  omega_unoccupied    = None,
+                                  mass                = None,
+                                  equilibrium_shift   = None,
+                                  n_states_occupied   = 200,
+                                  n_states_unoccupied = 200
+                                  )
+        self.init_output_variables(
+                                  energies_occupied   = None,
+                                  energies_unoccupied = None,
+                                  overlap_matrix      = None
+                                  )
+        self.set_variables(kwargs)
 
-    def update(self):
+    def do_update(self):
         from scipy.constants import hbar
         from math import sqrt,log,pi,exp
         from scipy import arange,array
 
-        changed = self.__changed
-        self.__changed = False
-        if changed :
+        if self.changed :
             omega_occupied = self.omega_occupied ; omega_unoccupied = self.omega_unoccupied
             mass = self.mass ; equilibrium_shift = self.equilibrium_shift
             n_states_occupied = self.n_states_occupied ; n_states_unoccupied = self.n_states_unoccupied
@@ -95,52 +116,11 @@ class SchmidtOverlaps(object):
                     do_fill(m,n)
                     c += 1
 
-            self.energies_occupied   =   (arange(float(n_states_occupied))+.5)*hbar*omega_occupied
-            self.energies_unoccupied = (arange(float(n_states_unoccupied))+.5)*hbar*omega_unoccupied
-            self.overlap_matrix      = array(I)
-        return changed
-        
-    def get_omega_occupied(self):
-        return self.__omega_occupied
-    def set_omega_occupied(self,omega):
-        self.__omega_occupied = omega
-        self.__changed = True
-    omega_occupied = property(get_omega_occupied,set_omega_occupied)
-
-    def get_omega_unoccupied(self):
-        return self.__omega_unoccupied
-    def set_omega_unoccupied(self,omega):
-        self.__omega_unoccupied = omega
-        self.__changed = True
-    omega_unoccupied = property(get_omega_unoccupied,set_omega_unoccupied)
-
-    def get_mass(self):
-        return self.__mass
-    def set_mass(self,m):
-        self.__mass = m
-        self.__changed = True
-    mass = property(get_mass,set_mass)
-
-    def get_equilibrium_shift(self):
-        return self.__equilibrium_shift
-    def set_equilibrium_shift(self,e):
-        self.__equilibrium_shift = e
-        self.__changed = True
-    equilibrium_shift = property(get_equilibrium_shift,set_equilibrium_shift)
-
-    def get_n_states_occupied(self):
-        return self.__n_states_occupied
-    def set_n_states_occupied(self,n):
-        self.__n_states_occupied = n
-        self.__changed = True
-    n_states_occupied = property(get_n_states_occupied,set_n_states_occupied)
-
-    def get_n_states_unoccupied(self):
-        return self.__n_states_unoccupied
-    def set_n_states_unoccupied(self,n):
-        self.__n_states_unoccupied = n
-        self.__changed = True
-    n_states_unoccupied = property(get_n_states_unoccupied,set_n_states_unoccupied)
+            self.internal_energies_occupied   =   (arange(float(n_states_occupied))+.5)*hbar*omega_occupied
+            self.internal_energies_unoccupied = (arange(float(n_states_unoccupied))+.5)*hbar*omega_unoccupied
+            self.internal_overlap_matrix      = array(I)
+            return True
+        return False
 
     def partition_function_occupied(self,temperature):
         from harmonic import harmonic_oscillator_partition_function

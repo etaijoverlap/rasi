@@ -16,10 +16,10 @@
 #
 ###############################################################################
 
+from rasi.base import BasicCalculator
 
-
-class ClassicalLineShape(object):
-    def __init__(self, k_occupied=None, k_unoccupied=None, equilibrium_shift=None, thermodynamic_level=None, temperature=None):
+class ClassicalLineShape(BasicCalculator):
+    def __init__(self, **kwargs):
         """
             Properties:
             k_occupied    ... Spring constant for the mode when the electron state 
@@ -32,18 +32,18 @@ class ClassicalLineShape(object):
                          parabolas referenced to some defined energy) for the transition
             temperature     ... Temperature (optional), used as default in later calculations
         """
-        self.__k_occupied          = None
-        self.__k_unoccupied        = None
-        self.__equilibrium_shift   = None
-        self.__thermodynamic_level = None
-        self.__temperature         = None
-        self.__changed             = False
 
-        if k_occupied          != None: self.k_occupied          = k_occupied
-        if k_unoccupied        != None: self.k_unoccupied        = k_unoccupied
-        if equilibrium_shift   != None: self.equilibrium_shift   = equilibrium_shift
-        if thermodynamic_level != None: self.thermodynamic_level = thermodynamic_level
-        if temperature         != None: self.temperature         = temperature
+        self.init_input_variables(
+                   k_occupied          = None,
+                   k_unoccupied        = None,
+                   equilibrium_shift   = None,
+                   thermodynamic_level = None,
+                   temperature         = None
+                   )
+        self.init_output_variables(
+                   oxidation = None,
+                   reduction = None
+                   )           
 
     @staticmethod
     def __partitionfunction(Momega2,T):
@@ -53,12 +53,11 @@ class ClassicalLineShape(object):
         # (4.79) in my thesis
         return sqrt(2*pi*kB*T/Momega2)
 
-    def update(self):
+    def do_update(self):
         from numpy import vectorize
-        if self.__changed:
-            self.oxidation = vectorize(self._oxidation)
-            self.reduction = vectorize(self._reduction)
-            self.__changed = False
+        if self.changed:
+            self.internal_oxidation = vectorize(self._oxidation)
+            self.internal_reduction = vectorize(self._reduction)
             return True
         return False
 
@@ -79,42 +78,6 @@ class ClassicalLineShape(object):
         if b < 0:
             raise ValueError("Parabolas have no real-valued crossings")
         return ( ( a + sqrt(b) ) / D, (a - sqrt(b) ) / D )
-
-    def get_k_occupied(self):
-        return self.__k_occupied
-    def set_k_occupied(self,k):
-        self.__k_occupied = k
-        self.__changed = True
-    k_occupied = property(get_k_occupied,set_k_occupied)
-
-    def get_k_unoccupied(self):
-        return self.__k_unoccupied 
-    def set_k_unoccupied(self,k):
-        self.__k_unoccupied  = k
-        self.__changed = True
-    k_unoccupied = property(get_k_unoccupied,set_k_unoccupied)
-
-    def get_equilibrium_shift(self):
-        return self.__equilibrium_shift
-    def set_equilibrium_shift(self,s):
-        self.__equilibrium_shift = s
-        self.__changed = True
-    equilibrium_shift = property(get_equilibrium_shift,set_equilibrium_shift)
-
-    def get_thermodynamic_level(self):
-        return self.__thermodynamic_level
-    def set_thermodynamic_level(self,t):
-        self.__thermodynamic_level = t
-        self.__changed = True
-    thermodynamic_level = property(get_thermodynamic_level,set_thermodynamic_level)
-
-    def get_temperature(self):
-        return self.__temperature
-    def set_temperature(self,T):
-        self.__temperature = T
-        self.__changed     = True
-    temperature = property(get_temperature,set_temperature)
-
 
         
     # To all Java/C++/... programmers: remember that those methods are DETACHABLE!

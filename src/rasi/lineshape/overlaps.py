@@ -21,24 +21,21 @@ def gaussian(sigma,x0,x):
     from scipy import exp
     return ((2.*pi*sigma**2)**-.5)*exp(-(x-x0)**2/(2*sigma**2)) 
 
-class SmearedLineShape(object):
-    def __init__(self,discrete_lineshape=None, smearing=None, accuracy=None):
-        self.__discrete_lineshape = None
-        self.__smearing           = None
-        self.__accuracy           = 1e-12 # Has no effect yet!!
+from rasi.base import BasicCalculator
 
-        self.__changed = False
+class SmearedLineShape(BasicCalculator):
+    def __init__(self,**kwargs):
+        self.init_input_variables(
+                                   discrete_lineshape = None,
+                                   smearing           = None,
+                                 )
+        self.init_output_variables()
+        self.set_variables(kwargs)
 
-        if discrete_lineshape != None: self.discrete_lineshape = discrete_lineshape
-        if smearing           != None: self.smearing           = smearing
-        if accuracy           != None: self.accuracy           = accuracy
-
-    def update(self):
+    def do_update(self):
         ls_changed =  self.discrete_lineshape.update()
-        self_changed = self.__changed
-        self.__changed = False
 
-        return self_changed or ls_changed
+        return self.changed or ls_changed
 
     def __smeared(self,energies,weights,E):
         sigma = self.smearing
@@ -57,26 +54,27 @@ class SmearedLineShape(object):
         weights  = self.discrete_lineshape.reduction_weights
         return self.__smeared(energies,weights,E)
 
-class DiscreteLineShape(object):
-    def __init__(self, overlaps=None, thermodynamic_level=None, temperature = None):
-        self.__overlaps            = None
-        self.__temperature         = None
-        self.__thermodynamic_level = None
-
-        self.__changed = False
-
-        if overlaps            != None: self.overlaps            = overlaps
-        if temperature         != None: self.temperature         = temperature
-        if thermodynamic_level != None: self.thermodynamic_level = thermodynamic_level
+class DiscreteLineShape(BasicCalculator):
+    def __init__(self, **kwargs):
+        self.init_input_variables(
+                                   overlaps            = None,
+                                   temperature         = None,
+                                   thermodynamic_level = None
+                                 )
+        self.init_output_variables(
+                                   oxidation_energies = None,
+                                   oxidation_weights  = None,
+                                   reduction_energies = None,
+                                   reduction_weights  = None
+                                  )
+        self.set_variables(kwargs)
 
     def update(self):
         from scipy.constants import k as kB
         from scipy import exp,array
-        self_changed     = self.__changed
         overlaps_changed = self.overlaps.update()
-        self.__changed = False
 
-        if self_changed or overlaps_changed:
+        if self.changed or overlaps_changed:
             overlaps = self.overlaps
             T        = self.temperature
             S        = overlaps.overlap_matrix
@@ -110,31 +108,11 @@ class DiscreteLineShape(object):
             oxidation.sort(key=(lambda (E,w): E))
             reduction.sort(key=(lambda (E,w): E))
 
-            self.oxidation_weights  = array([ w for E,w in oxidation ])
-            self.oxidation_energies = array([ E for E,w in oxidation ])
+            self.internal_oxidation_weights  = array([ w for E,w in oxidation ])
+            self.internal_oxidation_energies = array([ E for E,w in oxidation ])
 
-            self.reduction_weights  = array([ w for E,w in reduction ])
-            self.reduction_energies = array([ E for E,w in reduction ])
+            self.internal_reduction_weights  = array([ w for E,w in reduction ])
+            self.internal_reduction_energies = array([ E for E,w in reduction ])
             return True
         return False
 
-    def get_overlaps(self):
-        return self.__overlaps
-    def set_overlaps(self,o):
-        self.__overlaps = o
-        self.__changed = True
-    overlaps = property(get_overlaps,set_overlaps)
-
-    def get_temperature(self):
-        return self.__temperature
-    def set_temperature(self,T):
-        self.__temperature = T
-        self.__changed = True
-    temperature = property(get_temperature,set_temperature)
-
-    def get_thermodynamic_level(self):
-        return self.__thermodynamic_level
-    def set_thermodynamic_level(self,ET):
-        self.__thermodynamic_level = ET
-        self.__changed = True
-    thermodynamic_level = property(get_thermodynamic_level,set_thermodynamic_level)

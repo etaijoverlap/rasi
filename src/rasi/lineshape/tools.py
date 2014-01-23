@@ -16,63 +16,54 @@
 #
 ###############################################################################
 
-class LineShapeBuffer(object):
+from rasi.base import BasicCalculator
+
+class LineShapeBuffer(BasicCalculator):
     """
         Samples a lineshape on a given grid. May be used to significantly speed
         up the calculation of numerical integrals.
     """
-    def __init__(self, lineshape = None, energy_grid = None):
-        self.__lineshape   = None
-        self.__energy_grid = None
-        self.__changed = False
+    def __init__(self, **kwargs):
+        self.init_input_variables(
+                                  lineshape   = None,
+                                  energy_grid = None
+                                  )
+        self.init_output_variables(
+                                  oxidation_values = None,
+                                  reduction_values = None,
+                                  oxidation        = None,
+                                  reduction        = None
+                                  )
+        self.set_variables(kwargs)
 
-        if lineshape   != None: self.lineshape = lineshape
-        if energy_grid != None: self.energy_grid = energy_grid
-
-    def update(self):
+    def do_update(self):
         from scipy.interpolate import interp1d
         ls_changed = self.lineshape.update()
 
-        changed = self.__changed or ls_changed
-        self.__changed = False
+        if self.changed or ls_changed:
+            self.internal_oxidation_values = self.lineshape.oxidation(self.energy_grid)
+            self.internal_reduction_values = self.lineshape.reduction(self.energy_grid)
 
-        if changed:
-            self.oxidation_values = self.lineshape.oxidation(self.energy_grid)
-            self.reduction_values = self.lineshape.reduction(self.energy_grid)
-
-            self.oxidation = interp1d(self.energy_grid,self.oxidation_values,bounds_error=False,fill_value=0.)  
-            self.reduction = interp1d(self.energy_grid,self.reduction_values,bounds_error=False,fill_value=0.)  
+            self.internal_oxidation = interp1d(self.energy_grid,self.oxidation_values,bounds_error=False,fill_value=0.)  
+            self.internal_reduction = interp1d(self.energy_grid,self.reduction_values,bounds_error=False,fill_value=0.)  
             return True
         return False
 
-    def get_lineshape(self):
-        return self.__lineshape
-    def set_lineshape(self,l):
-        self.__lineshape = l
-        self.__changed = True
-    lineshape = property(get_lineshape,set_lineshape)
 
-    def get_energy_grid(self):
-        return self.__energy_grid
-    def set_energy_grid(self,E):
-        self.__energy_grid = E
-    energy_grid = property(get_energy_grid,set_energy_grid)
-
-
-class LineShapeEnergyCorrector(object):
+class LineShapeEnergyCorrector(BasicCalculator):
     """
         Shifts the energy scale of the line shape by a given amount.
     """
-    def __init__(self, lineshape = None, correction_energy = None):
-        self.__lineshape         = None
-        self.__correction_energy = 0.
-        self.__changed = False
+    def __init__(self, **kwargs):
+        self.init_input_variables(
+                                  lineshape         = None,
+                                  correction_energy = 0.
+                                 )
+        self.init_output_variables()
+        self.set_variables(kwargs)
 
-        if lineshape         != None: self.lineshape = lineshape
-        if correction_energy != None: self.correction_energy = correction_energy
-
-    def update(self):
-        return self.lineshape.update()
+    def do_update(self):
+        return self.changed or self.lineshape.update()
 
     def oxidation(self,E):
         E_c = self.correction_energy
@@ -81,20 +72,6 @@ class LineShapeEnergyCorrector(object):
     def reduction(self,E):
         E_c = self.correction_energy
         return self.lineshape.reduction(E + E_c)
-
-    def get_lineshape(self):
-        return self.__lineshape
-    def set_lineshape(self,l):
-        self.__lineshape = l
-        self.__changed = True
-    lineshape = property(get_lineshape,set_lineshape)
-
-    def set_correction_energy(self,E):
-        self.__correction_energy = E
-        self.__changed = True
-    def get_correction_energy(self):
-        return self.__correction_energy
-    correction_energy = property(get_correction_energy,set_correction_energy)
 
 def calc_modal_vector(atoms1,atoms2):
     """
@@ -184,44 +161,6 @@ def write_matrix(filename,matrix):
                 outfile.write("%e  "%iter.next())
             outfile.write("\n")
     except StopIteration: pass
-
-
-def calc_lsf(Ew_i, # Eigenvalues of initial state
-             Ew_f, # Eigenvalues of final state
-             S,    # Overlap matrix
-             T,    # Temperature
-             Z=None, # Partition function (calculated if not given)
-             e_capture = True, # Electron capture transition (hole capture if false)
-             echo=True # Report status to stdout
-             ):
-    from math import exp
-
-    if echo:
-        print
-        print "Computing line shape function"
-        print "-----------------------------"
-        print
-
-    if Z == None:
-        Z = sum( exp(-E/(kB*T)) for E in Ew_i)
-        if echo:
-            print "Partition function for initial state (calculated): ",Z
-            print
-    else:
-        if echo:
-            print "Partition function for initial state (given): ",Z
-            print
-    LS=[]
-    for E_init,S_i in zip(Ew_i,S):
-        p0 = exp(-E_init/(kB*T))/Z
-        for E_final,o in zip(Ew_f,S_i):
-            if e_capture:
-                Et = E_final-E_init # Electron capture gives a peak at +Delta E
-            else:
-                Et = E_init-E_final # Hole capture gives a peak at -Delta E
-            LS.append((Et,p0*o**2))
-    LS.sort(lambda (E1,_1),(E2,_2): 1 if E1>E2 else -1)
-    return LS
 
 
 def compare_results((Ew_i_1,Ew_f_1,S_1),(Ew_i_2,Ew_f_2,S_2)):
