@@ -1,3 +1,14 @@
+"""
+    Reliability Analysis of Semiconductor Interfaces -- ElectronicMatrixElement package
+    -----------------------------------------------------------------------------------
+
+    In this package, all the calculator objects for electronic matrix elements are defined.
+    Electronic matrix elements are necessary to calculate capture and emission rates within
+    the non-radiative multi-phonon transition theory... and possibly also in other theories.
+
+"""
+
+
 ###############################################################################
 #
 #  RASI ... Reliability Analysis of Semiconductor Interfaces

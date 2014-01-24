@@ -63,7 +63,8 @@ class LineShapeEnergyCorrector(BasicCalculator):
         self.set_variables(kwargs)
 
     def do_update(self):
-        return self.changed or self.lineshape.update()
+        ls_update = self.lineshape.update()
+        return self.changed or ls_update
 
     def oxidation(self,E):
         E_c = self.correction_energy

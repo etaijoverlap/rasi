@@ -1,3 +1,15 @@
+"""
+    Reliability Analysis of Semiconductor Interfaces -- BASE package
+    ----------------------------------------------------------------
+
+    This package defines basic objects and functions that are usually invisible
+    to the user. If you just plan to use this library rather than extending
+    it by writing new objects or methods, this is most likely the worst place
+    to start. Go away, there is nothing here for you to find.
+    If you are actually planning to add some functionality to RASI, be welcome
+    and make yourself a home.
+"""
+
 ###############################################################################
 #
 #  RASI ... Reliability Analysis of Semiconductor Interfaces
@@ -17,6 +29,83 @@
 ###############################################################################
 
 class BasicCalculator(object):
+    """
+        BasicCalculator:
+        ---------------
+
+        The calculation of experimentally observable quantities in this library
+        usually proceeds within a hierachy of objects, where each object receives
+        input from the user and the child objects and provides output to either
+        the user or other objects which are in the next level of the hierachy.
+
+        A basic concept of this computational tree is that the output parameters
+        of each node are only valid after an "update()" signal has been processed.
+        On receiving this signal, the node updates its internal state and at the
+        same time propagates the signal to its child nodes.
+
+        The BasicCalculator base class implements some functionality to make the
+        development of node objects easier. A node object should always be derived
+        from BasicCalculator, and have a constructor of the form:
+
+        def __init__(self,**kwargs):
+            self.init_input_variables(
+                                      <input variable 1> = <initial value 1>,
+                                      <input variable 2> = <initial value 2>,
+                                                 ...
+                                     )
+            self.init_output_variables(
+                                      <output variable 1> = <initial value 3>,
+                                      <output variable 2> = <initial value 4>,
+                                                 ...
+                                      )
+            self.set_variables(kwargs)
+
+        Further, objects which are derived from BasicCalculator should NOT implement
+        the update method directly (otherwise bad things will happen), but instead
+        implement a 
+
+            def do_update(self):
+                 <update code here>
+
+        method, which is called by the update method of BasicCalculator.
+
+        After input and output variables are registered as in the example code above,
+        they can in principle be used like normal variables of the object. The
+        BasicCalculator class keeps track of changes to the input variables, which
+        can be checked via the *_changed parameters. These flags are automatically
+        reset after the update method has been processed.
+
+        If for example "foo" is an input parameter of the node object "Bar", the following code holds:
+            
+        bar = Bar()
+
+        print bar.foo_changed  # prints "False"
+
+        bar.foo = 4
+
+        print bar.foo_changed # prints "True"
+
+        bar.update()
+
+        print bar.foo_changed # prints "False"
+
+        There is also a global flag "bar.changed" which signals if ANY of the input variables
+        has changed.
+
+        The output parameters can be directly read but not directly written. The idea is 
+        to avoid accidential overwriting of output data by the user. Writing to output
+        parameters has to proceed via the internal_* aliases. 
+
+        If for example "spam" is an output parameter of the node object "Eggs", the following code holds:
+
+        eggs = Eggs()
+
+        eggs.spam = 4 # throws AttributeError
+
+        eggs.internal_spam = 4 # Works, but should only be used in the update method
+
+        print eggs.spam # prints "4"
+    """
     def __init__(self):
         self.__dict__["_input_variables"]  = {}
         self.__dict__["_output_variables"]  = {}

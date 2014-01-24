@@ -1,3 +1,13 @@
+"""
+    Reliability Analysis of Semiconductor Interfaces
+    ------------------------------------------------
+
+    This library is part of an effort to shed light on the exchange of charge carriers
+    between point-defects and extended states, mostly at semiconductor-oxide interfaces.
+    It is developed at the Institute for Microelectronics of the Technische Universitaet Wien.
+    
+    http://www.iue.tuwien.ac.at
+"""
 ###############################################################################
 #
 #  RASI ... Reliability Analysis of Semiconductor Interfaces

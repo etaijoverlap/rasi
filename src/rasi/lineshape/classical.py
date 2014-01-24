@@ -19,19 +19,31 @@
 from rasi.base import BasicCalculator
 
 class ClassicalLineShape(BasicCalculator):
+    """
+        ClassicalLineShape calculates line shapes assuming a classical one-dimensional
+        motion of the nuclei. 
+
+        INPUT PARAMETERS:
+        ----------------
+
+        k_occupied ........... Spring constant for the mode when the electron state 
+                               is occupied
+        k_unoccupied ......... Spring constant for the model when the electron state
+                               is unoccupied
+        equilibrium_shift .... Configuration shift along the modal coordinate induced
+                               by the transition
+        thermodynamic_level .. `Thermodynamic level` (i.e. energetic shift between the 
+                               parabolas referenced to some defined energy) for the transition
+        temperature .......... Temperature in Kelvins
+
+
+        OUTPUT PARAMETERS:
+        -----------------
+
+        oxidation(E) ......... Oxidation lineshape
+        reduction(E) ......... Reduction lineshape
+    """
     def __init__(self, **kwargs):
-        """
-            Properties:
-            k_occupied    ... Spring constant for the mode when the electron state 
-                        is occupied
-            k_unoccupied  ... Spring constant for the model when the electron state
-                        is unoccupied
-            equilibrium_shift   ... Configuration shift along the modal coordinate induced
-                        by the transition
-            thermodynamic_level     ... `Thermodynamic level` (i.e. energetic shift between the 
-                         parabolas referenced to some defined energy) for the transition
-            temperature     ... Temperature (optional), used as default in later calculations
-        """
 
         self.init_input_variables(
                    k_occupied          = None,
