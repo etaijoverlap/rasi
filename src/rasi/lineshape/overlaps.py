@@ -1,3 +1,10 @@
+"""
+    Reliability Analysis of Semiconductor Interfaces -- Overlap-Based Lineshapes
+    ----------------------------------------------------------------------------
+    
+
+"""
+
 ###############################################################################
 #
 #  RASI ... Reliability Analysis of Semiconductor Interfaces
@@ -69,7 +76,7 @@ class DiscreteLineShape(BasicCalculator):
                                   )
         self.set_variables(kwargs)
 
-    def update(self):
+    def do_update(self):
         from scipy.constants import k as kB
         from scipy import exp,array
         overlaps_changed = self.overlaps.update()

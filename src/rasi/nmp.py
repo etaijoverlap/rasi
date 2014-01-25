@@ -32,7 +32,7 @@ class FullNMPTransition(BasicCalculator):
         self.set_variables(kwargs)
         
 
-    def update(self):
+    def do_update(self):
         from scipy.integrate import trapz
         ls_changed = self.lineshape.update()
         em_changed = self.electronic_matrix_element.update()
@@ -70,7 +70,7 @@ class ColdCarrierNumerical(object):
 
         self.__changed = False
 
-    def update(self):
+    def do_update(self):
         from scipy.constants import k as kB
         from math import exp
 
