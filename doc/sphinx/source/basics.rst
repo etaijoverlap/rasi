@@ -17,8 +17,13 @@ which is built as part of the `European Union FP7 project MORDRED
 Basic Implementation Concepts
 =============================
 
-Computations are performed using RASI by putting *Calculator objects* together
-which correspond to different parts of the calculation. 
+The computations performed within RASI combine data from various sources. Due to
+their post-processing nature it is possible to represent the calculations performed
+by RASI as a hierachy without loops. Every node in this hierachy provides data
+to lower-lying elements and receives data from the user or higher-lying elements.
+In the implementation, this structure is realized by *Calculator objects*, which
+correspond to the calculation steps and which are put together to perform a
+specific calculation.
 
 .. graphviz::
     
@@ -42,7 +47,7 @@ which correspond to different parts of the calculation.
         
     }
 
-Together, these Calculator objects build a hierachy where the value
+Together, these Calculator objects build the mentioned hierachy where the value
 in every node of the tree depends on the parameters of the node and
 the outputs of the higher-lying nodes. The Calculator objects
 implement the necessary logic to ensure that during parameter calibrations
