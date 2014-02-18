@@ -1,0 +1,144 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Reliability Analysis of Semiconductor Interfaces (RASI) documentation &mdash; RASI 0.01 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.01',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="RASI 0.01 documentation" href="#" />
+    <link rel="next" title="History of RASI" href="basics.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="basics.html" title="History of RASI"
+             accesskey="N">next</a> |</li>
+        <li><a href="#">RASI 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Next topic</h4>
+  <p class="topless"><a href="basics.html"
+                        title="next chapter">History of RASI</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="reliability-analysis-of-semiconductor-interfaces-rasi-documentation">
+<h1>Reliability Analysis of Semiconductor Interfaces (RASI) documentation<a class="headerlink" href="#reliability-analysis-of-semiconductor-interfaces-rasi-documentation" title="Permalink to this headline">¶</a></h1>
+<p>RASI is a software package for the modeling of defects in semiconductors and
+(especially) at semiconductor-insulator interfaces. It is implemented as a
+library for the <a class="reference external" href="http://www.python.org">Python programming language</a> within
+the <a class="reference external" href="http://webhotel2.tut.fi/fys/mordred/">European Union FP7 project MORDRED</a>.</p>
+<p>As of yet, the library implements a post-processing toolflow that brings together
+microscopic defect data from electronic structure calculations and charge
+carrier data from macroscopic device models.</p>
+<p class="graphviz">
+<img src="_images/graphviz-3313ea5710c8588842d2def8b30148bb1d9af33e.png" alt="digraph foo {
+    es[label=&quot;Defect Model\n(Electronic Structure Level)&quot;,shape=box];
+    model [label=&quot;Model Assumptions&quot;,shape=box];
+    device [label=&quot;Charge Carrier Model\n(Macroscopic Device Simultaion)&quot;,shape=box];
+    meas [label = &quot;Predicted Measurement Data&quot;,shape=box];
+     es      -&gt; model;
+     device  -&gt; model;
+     model   -&gt; meas;
+}" />
+</p>
+<p>Contents:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="basics.html">History of RASI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="basics.html#basic-implementation-concepts">Basic Implementation Concepts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="theory.html">Theory of RASI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="theory.html#multi-state-defects">Multi-State Defects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="theory.html#thermally-activated-carrier-trapping">Thermally Activated Carrier Trapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="theory.html#bibliography">Bibliography</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementation.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementation.html#module-rasi.rates">rasi.rates</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="basics.html" title="History of RASI"
+             >next</a> |</li>
+        <li><a href="#">RASI 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Franz Schanovsky.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,167 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>History of RASI &mdash; RASI 0.01 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.01',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="RASI 0.01 documentation" href="index.html" />
+    <link rel="next" title="Theory of RASI" href="theory.html" />
+    <link rel="prev" title="Reliability Analysis of Semiconductor Interfaces (RASI) documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="theory.html" title="Theory of RASI"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Reliability Analysis of Semiconductor Interfaces (RASI) documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">RASI 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">History of RASI</a></li>
+<li><a class="reference internal" href="#basic-implementation-concepts">Basic Implementation Concepts</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Reliability Analysis of Semiconductor Interfaces (RASI) documentation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="theory.html"
+                        title="next chapter">Theory of RASI</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/basics.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="history-of-rasi">
+<h1>History of RASI<a class="headerlink" href="#history-of-rasi" title="Permalink to this headline">¶</a></h1>
+<p>This project was started in late 2013. It is an effort to integrate previously
+existing scripts, programs, and code-snippets into a common software framework
+which is built as part of the <a class="reference external" href="http://webhotel2.tut.fi/fys/mordred/">European Union FP7 project MORDRED</a>. It is mainly developed at the
+<a class="reference external" href="http://www.iue.tuwien.ac.at">Institute for Microelectronics</a> of the
+<a class="reference external" href="http://www.tuwien.ac.at">Technische Universität Wien</a>.</p>
+</div>
+<div class="section" id="basic-implementation-concepts">
+<h1>Basic Implementation Concepts<a class="headerlink" href="#basic-implementation-concepts" title="Permalink to this headline">¶</a></h1>
+<p>The computations performed within RASI combine data from various sources. Due to
+their post-processing nature it is possible to represent the calculations performed
+by RASI as a hierachy without loops. Every node in this hierachy provides data
+to lower-lying elements and receives data from the user or higher-lying elements.
+In the implementation, this structure is realized by <em>Calculator objects</em>, which
+correspond to the calculation steps and which are put together to perform a
+specific calculation.</p>
+<p class="graphviz">
+<img src="_images/graphviz-746cffab93d06ac7c53bb4832a90aff217163374.png" alt="digraph {
+    c  [label = &quot;Calculator&quot;,shape=box];
+    p1 [label = &quot;Parameter 1&quot;, shape=plaintext];
+    p2 [label = &quot;Parameter 2&quot;, shape=plaintext];
+
+    c2  [label = &quot;Another\n Calculator&quot;,shape=box];
+    p21 [label = &quot;Parameter 1&quot;, shape=plaintext];
+    p22 [label = &quot;Parameter 2&quot;, shape=plaintext];
+
+    R [label = &quot;Result&quot;, shape=ellipse ] ;
+    p1 -&gt; c;
+    p2 -&gt; c;
+    p21 -&gt; c2;
+    p22 -&gt; c2;
+    c2 -&gt; c;
+
+    c -&gt; R;
+
+}" />
+</p>
+<p>Together, these Calculator objects build the mentioned hierachy where the value
+in every node of the tree depends on the parameters of the node and
+the outputs of the higher-lying nodes. The Calculator objects
+implement the necessary logic to ensure that during parameter calibrations
+or parameter sweeps only those parts of the calculation tree that have
+changed are recalculated.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="theory.html" title="Theory of RASI"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Reliability Analysis of Semiconductor Interfaces (RASI) documentation"
+             >previous</a> |</li>
+        <li><a href="index.html">RASI 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Franz Schanovsky.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

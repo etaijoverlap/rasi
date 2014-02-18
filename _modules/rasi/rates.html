@@ -1,0 +1,179 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rasi.rates &mdash; RASI 0.01 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.01',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="RASI 0.01 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">RASI 0.01 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for rasi.rates</h1><div class="highlight"><pre>
+<span class="c">###############################################################################</span>
+<span class="c">#</span>
+<span class="c">#  RASI ... Reliability Analysis of Semiconductor Interfaces</span>
+<span class="c">#</span>
+<span class="c">#  (c) 2013-2014 Franz Schanovsky </span>
+<span class="c">#  </span>
+<span class="c">#  This project is dedicated to the loving memory of Margarete and Johann </span>
+<span class="c">#  Mittermayr.</span>
+<span class="c">#</span>
+<span class="c">###############################################################################</span>
+<span class="c">#</span>
+<span class="c">#    This software is licensed under the EUPL V 1.1</span>
+<span class="c">#</span>
+<span class="c">#    This software is provided &quot;as is&quot; without warranty of any kind, see the </span>
+<span class="c">#    respective section in the EUPL. USE AT YOUR OWN RISK.</span>
+<span class="c">#</span>
+<span class="c">###############################################################################</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The rates module collects classes that implement different defect models. Currently, </span>
+<span class="sd">there is only the *RateCalculator4State*, which implements the current &quot;workhorse&quot;, the</span>
+<span class="sd">four state defect. The purpose of the calculators in this module is to collect together</span>
+<span class="sd">the rates for all microscopic transitions which are then used to compute measurable</span>
+<span class="sd">quantities or the transient behavior of defects.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">rasi.base</span> <span class="kn">import</span> <span class="n">BasicCalculator</span>
+
+<div class="viewcode-block" id="RateCalculator4State"><a class="viewcode-back" href="../../implementation.html#rasi.rates.RateCalculator4State">[docs]</a><span class="k">class</span> <span class="nc">RateCalculator4State</span><span class="p">(</span><span class="n">BasicCalculator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates the microscopic rates for a four state defect. </span>
+
+<span class="sd">        **Input**</span>
+
+<span class="sd">        :var recharge_primary: NMP rate calculator for the primary configuration</span>
+<span class="sd">        :var recharge_secondary: NMP rate calculator for the secondary configuration</span>
+<span class="sd">        :var nu: Attempt frequency</span>
+<span class="sd">        :var energies: Energy barriers</span>
+<span class="sd">        :var temperature: Temperature</span>
+
+<span class="sd">        **Output**</span>
+
+<span class="sd">        :var rates: A dictionary containing the rates of the four state defect model</span>
+<span class="sd">        :var timeconstants: A dictionary containing the time constants (inverse of the rates)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_input_variables</span><span class="p">(</span>
+                <span class="n">recharge_primary</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="n">recharge_secondary</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
+                <span class="n">nu</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span>
+                <span class="n">energies</span> <span class="o">=</span> <span class="p">{},</span>
+                <span class="n">temperature</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_output_variables</span><span class="p">(</span>
+                <span class="n">rates</span> <span class="o">=</span> <span class="p">{},</span>
+                <span class="n">timeconstants</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_variables</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">do_update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">scipy.constants</span> <span class="kn">import</span> <span class="n">k</span> <span class="k">as</span> <span class="n">kB</span>
+        <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">exp</span>
+        <span class="n">changed</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">rates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rates</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">recharge_primary</span><span class="o">.</span><span class="n">update</span><span class="p">()</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">changed_recharge_primary</span><span class="p">:</span>
+            <span class="n">rates</span><span class="p">[</span><span class="s">&quot;1-&gt;2&#39;&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recharge_primary</span><span class="o">.</span><span class="n">oxidation_rate</span>
+            <span class="n">rates</span><span class="p">[</span><span class="s">&quot;2&#39;-&gt;1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recharge_primary</span><span class="o">.</span><span class="n">reduction_rate</span>
+            <span class="n">changed</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">recharge_secondary</span><span class="o">.</span><span class="n">update</span><span class="p">()</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">changed_recharge_secondary</span><span class="p">:</span>
+            <span class="n">rates</span><span class="p">[</span><span class="s">&quot;1&#39;-&gt;2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recharge_secondary</span><span class="o">.</span><span class="n">oxidation_rate</span>
+            <span class="n">rates</span><span class="p">[</span><span class="s">&quot;2-&gt;1&#39;&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recharge_secondary</span><span class="o">.</span><span class="n">reduction_rate</span>
+            <span class="n">changed</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">changed_energies</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">changed_nu</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">changed_temperature</span><span class="p">:</span>
+            <span class="n">E</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energies</span> <span class="p">;</span> <span class="n">nu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="p">;</span> <span class="n">T</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span>
+            <span class="k">for</span> <span class="n">transition</span><span class="p">,</span><span class="n">Eb</span> <span class="ow">in</span> <span class="n">E</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="n">rates</span><span class="p">[</span><span class="n">transition</span><span class="p">]</span> <span class="o">=</span> <span class="n">nu</span> <span class="o">*</span> <span class="n">exp</span><span class="p">(</span> <span class="o">-</span><span class="n">Eb</span><span class="o">/</span><span class="p">(</span><span class="n">kB</span><span class="o">*</span><span class="n">T</span><span class="p">)</span> <span class="p">)</span>
+            <span class="n">changed</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="k">if</span> <span class="n">changed</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">rate</span> <span class="ow">in</span> <span class="n">rates</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">timeconstants</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">rate</span><span class="o">**-</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="n">changed</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">RASI 0.01 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Franz Schanovsky.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

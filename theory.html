@@ -1,0 +1,173 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Theory of RASI &mdash; RASI 0.01 documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.01',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="RASI 0.01 documentation" href="index.html" />
+    <link rel="next" title="API Reference" href="implementation.html" />
+    <link rel="prev" title="History of RASI" href="basics.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementation.html" title="API Reference"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="basics.html" title="History of RASI"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">RASI 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Theory of RASI</a><ul>
+<li><a class="reference internal" href="#multi-state-defects">Multi-State Defects</a></li>
+<li><a class="reference internal" href="#thermally-activated-carrier-trapping">Thermally Activated Carrier Trapping</a></li>
+<li><a class="reference internal" href="#bibliography">Bibliography</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="basics.html"
+                        title="previous chapter">History of RASI</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="implementation.html"
+                        title="next chapter">API Reference</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/theory.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="theory-of-rasi">
+<h1>Theory of RASI<a class="headerlink" href="#theory-of-rasi" title="Permalink to this headline">¶</a></h1>
+<p>The models implemented in RASI are used to described interactions between the
+carrier gas in semiconductor devices and point defects. The intended field of
+application for the package is the research of reliability topics such as the
+Bias-Temperature Instability and related degradation phenomena.  The defect
+models implemented in RASI describe multi-state defects which exchange carriers
+with the semiconductor device through multi-phonon transitions <a class="reference internal" href="#mrel2012">[MREL2012]</a>.</p>
+<div class="section" id="multi-state-defects">
+<h2>Multi-State Defects<a class="headerlink" href="#multi-state-defects" title="Permalink to this headline">¶</a></h2>
+<p>Defects in the multi-state multi-phonon model can exist in two different charge states and
+two different configurations (internal states). The degradation and recovery transients
+observed in BTS-experiments are understood as an ensemble response of these multi-state
+defects <a class="reference internal" href="#sispad2013">[SISPAD2013]</a>.</p>
+<img alt="_images/fourstatedefect.png" src="_images/fourstatedefect.png" />
+<p>Transitions between the internal states are understood as barrier hopping transitions
+and modeled using a simple Arrhenius law</p>
+<div class="math">
+\[k_{ij} = \nu \exp\big ( \frac{E_{ij}}{k_B T} \big )\]</div>
+<p>where <span class="math">\(k_{ij}\)</span> is the hopping rate from state i to j, <span class="math">\(\nu\)</span> is the attempt frequency,
+and <span class="math">\(E_{ij}\)</span> is the barrier for going from state i to j. Transitions involving a change
+of the charge state are understood as thermally activated carrier trapping events and described
+in the framework of non-radiative multi-phonon transitions.</p>
+</div>
+<div class="section" id="thermally-activated-carrier-trapping">
+<h2>Thermally Activated Carrier Trapping<a class="headerlink" href="#thermally-activated-carrier-trapping" title="Permalink to this headline">¶</a></h2>
+<p>The exchange of charge between the defect and the rest of the device is modeled in the framework
+of the multi-phonon transition theory. Central to this theory is the concept of line shape functions,
+which can be understood as a capture cross section that depends on the carrier energy, temperature and
+the electric fields in the device <a class="reference internal" href="#sispad2013">[SISPAD2013]</a>.</p>
+</div>
+<div class="section" id="bibliography">
+<h2>Bibliography<a class="headerlink" href="#bibliography" title="Permalink to this headline">¶</a></h2>
+<table class="docutils citation" frame="void" id="mrel2012" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[MREL2012]</a></td><td><a class="reference external" href="http://dx.doi.org/10.1016/j.microrel.2011.09.002">T. Grasser: &#8220;Stochastic Charge Trapping in Oxides: From Random Telegraph Noise to Bias Temperature Instabilities&#8221;; Microelectronics Reliability, 52 (invited) (2012), 39 - 70</a></td></tr>
+</tbody>
+</table>
+<table class="docutils citation" frame="void" id="sispad2013" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[SISPAD2013]</td><td><em>(<a class="fn-backref" href="#id2">1</a>, <a class="fn-backref" href="#id3">2</a>)</em> <a class="reference external" href="http://www.iue.tuwien.ac.at/pdf/ib_2013/CP2013_Schanovsky_2.pdf">F. Schanovsky, W. Gös, T. Grasser: &#8220;Advanced Modeling of Charge Trapping at Oxide Defects&#8221;; International Conference on Simulation of Semiconductor Processes and Devices (SISPAD), Glasgow, Scotland, United Kingdom;</a></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="implementation.html" title="API Reference"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="basics.html" title="History of RASI"
+             >previous</a> |</li>
+        <li><a href="index.html">RASI 0.01 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Franz Schanovsky.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
